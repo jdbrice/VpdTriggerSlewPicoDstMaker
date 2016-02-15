@@ -16,13 +16,13 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 	for ( int tube = 0; tube < 16; tube++ ){
 
-		cout << "start" << endl;
+		
 		int adcEast = pico->adc( "east", crate, tube );
 		int tdcEast = pico->tdc( "east", crate, tube );
 
 		int adcWest = pico->adc( "west", crate, tube );
 		int tdcWest = pico->tdc( "west", crate, tube );
-		cout << "stop" << endl;
+
 
 		int cTdcEast = corrEast( tube, adcEast, tdcEast );
 		int cTdcWest = corrWest( tube, adcWest, tdcWest );
