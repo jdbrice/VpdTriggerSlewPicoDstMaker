@@ -191,6 +191,9 @@ void VpdTriggerSlewPicoDstMaker::bookTree(){
 	tree = new TTree( crate.c_str(), "VpdTriggerSlewPicoDst data" );
 	tree->SetAutoSave( 1000 );
 	
+	tree->Branch("run",&data.run,"run/i");
+	tree->Branch("evt",&data.evt,"evt/i");
+	
 	tree->Branch("adcEast",&data.adcEast,"adcEast[16]/i");
 	tree->Branch("adcWest",&data.adcWest,"adcWest[16]/i");
 	tree->Branch("tdcEast",&data.tdcEast,"tdcEast[16]/i");
