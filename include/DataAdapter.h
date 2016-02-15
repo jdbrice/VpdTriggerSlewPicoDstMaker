@@ -43,6 +43,13 @@ public:
 		return 0;
 	}
 
+	virtual Int_t runNumber(){
+		return 0;
+	}
+	virtual Int_t eventNumber(){
+		return 0;
+	}
+
 
 	
 };

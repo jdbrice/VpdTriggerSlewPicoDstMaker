@@ -2778,6 +2778,13 @@ public :
 	virtual Float_t vZ() {
 		return MuEvent_mEventSummary_mPrimaryVertexPos_mX3[ 0 ];
 	}
+
+	virtual Int_t runNumber(){
+		return MuEvent_mRunInfo_mRunId[0];
+	}
+	virtual Int_t eventNumber(){
+		return MuEvent_mEventInfo_mId[0];
+	}
 };
 
 #endif

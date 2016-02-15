@@ -105,8 +105,8 @@ public:
 		outFile->cd();
 
 
-		// data.run = pico->MuEvent_mRunInfo_mRunId[0];
-		// data.evt = pico->MuEvent_mEventInfo_mId[0];
+		data.run = pico->RunNumber();
+		data.evt = pico->EventNumber(); 
 
 		data.vertexX = pico->vX();
 		data.vertexY = pico->vY();
