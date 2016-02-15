@@ -2720,7 +2720,7 @@ public :
 			if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
 				return MuEvent_mVpdTriggerDetector_mTDC[0][west][tube];
 			} else {
-				return MuEvent_mVpdTriggerDetector_mTDC[0][west][tube];
+				return MuEvent_mVpdTriggerDetector_mTDCmxq[0][west][tube];
 			}
 		}
 		cout << "NO TDC" << endl;
