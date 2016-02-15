@@ -107,7 +107,7 @@ void VpdTriggerSlewPicoDstMaker::readParams(){
 	string line;
 	while( getline( inf, line ) ){
 
-		DEBUG( classname(), << line );
+		DEBUG( classname(), line );
 		stringstream ss( line );
 
 		string boardId;
@@ -121,7 +121,7 @@ void VpdTriggerSlewPicoDstMaker::readParams(){
 			int opt;
 
 			ss >> channel >> nBins >> opt;
-			DEBUG( classname(), << "nBins " << nBins );
+			DEBUG( classname(), "nBins " << nBins );
 
 			numBins = nBins;
 			
@@ -129,7 +129,7 @@ void VpdTriggerSlewPicoDstMaker::readParams(){
 				for ( int i = 0; i < nBins; i++ ){
 					int be;
 					ss >> be;
-					DEBUG( classname(), << "[" << i << "] = " << be );
+					DEBUG( classname(), "[" << i << "] = " << be );
 					if ( "0x16" == boardId ) // east
 						eBinEdges[iEast][i] = be;
 					else if ("0x18" == boardId) // west
@@ -139,7 +139,7 @@ void VpdTriggerSlewPicoDstMaker::readParams(){
 				for ( int i = 0; i < nBins; i++ ){
 					int bc;
 					ss >> bc;
-					DEBUG( classname(), << "[" << i << "] = " << bc );
+					DEBUG( classname(), "[" << i << "] = " << bc );
 					if ( "0x16" == boardId ) // east
 						eCorrs[iEast][i] = bc;
 					else if ("0x18" == boardId) // west
