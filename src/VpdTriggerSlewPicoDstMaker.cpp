@@ -13,14 +13,16 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 	int fastAdcWest = 0;
 	int fastChWest = -1;
 
+	string crate = config.getString( nodePath + ".Crate" );
+
 
 	for ( int tube = 0; tube < 16; tube++ ){
 
-		int adcEast = pico->adc( "east", "bbq", tube );
-		int tdcEast = pico->tdc( "east", "bbq", tube );
+		int adcEast = pico->adc( "east", crate, tube );
+		int tdcEast = pico->tdc( "east", crate, tube );
 
-		int adcWest = pico->adc( "west", "bbq", tube );
-		int tdcWest = pico->tdc( "west", "bbq", tube );
+		int adcWest = pico->adc( "west", crate, tube );
+		int tdcWest = pico->tdc( "west", crate, tube );
 
 		int cTdcEast = corrEast( tube, adcEast, tdcEast );
 		int cTdcWest = corrWest( tube, adcWest, tdcWest );
