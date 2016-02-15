@@ -11,7 +11,7 @@
 		</input>
 
 		<Crate>bbq</Crate>
-		<Slewing url="/Users/danielbrandenburg/bnl/local/work/vpdCalibration/bin/run16/trigger/bbq_params.dat"/>
+		<Slewing url="/home/jdb12/work/VpdTriggerSlewPicoDstMaker/bin/bbq_params.dat"/>
 	
 
 		<output>
