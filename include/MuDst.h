@@ -2713,6 +2713,7 @@ public :
 			if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
 				return MuEvent_mVpdTriggerDetector_mTDC[0][east][ tube ];
 			} else {
+				cout << "MXQ" << endl;
 				return MuEvent_mVpdTriggerDetector_mTDCmxq[0][east][ tube ];
 			}
 		}
@@ -2720,6 +2721,7 @@ public :
 			if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
 				return MuEvent_mVpdTriggerDetector_mTDC[0][west][tube];
 			} else {
+				cout << "MXQ" << endl;
 				return MuEvent_mVpdTriggerDetector_mTDCmxq[0][west][tube];
 			}
 		}
@@ -2733,6 +2735,7 @@ public :
 			if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
 				return MuEvent_mVpdTriggerDetector_mADC[0][east][ tube ];
 			} else {
+				cout << "MXQ" << endl;
 				return MuEvent_mVpdTriggerDetector_mADCmxq[0][east][ tube ];
 			}
 		}
@@ -2740,6 +2743,7 @@ public :
 			if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
 				return MuEvent_mVpdTriggerDetector_mADC[0][west][tube];
 			} else {
+				cout << "MXQ" << endl;
 				return MuEvent_mVpdTriggerDetector_mADCmxq[0][west][tube];
 			}
 		}
