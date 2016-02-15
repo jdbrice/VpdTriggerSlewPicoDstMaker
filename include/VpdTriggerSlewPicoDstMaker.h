@@ -40,6 +40,8 @@ protected:
 
 	map<int, int> pulserMap;
 
+	string crate;
+
 
 
 public:
@@ -80,6 +82,9 @@ public:
 		tacOffsetWest = config.getIntVector( nodePath + ".TacOffsetWest", 0, 16 );
 
 		pulserMap = {{0,0}, { 1,0 }, {2,0}, {3,0}, {4,4}, {5,4}, {6,4}, {7,4}, {8,8}, {9,8}, {10,8}, {11,8}, {12,12}, {13,12}, {14,12}, {15,12} };
+
+		string crate = config.getString( nodePath + ".Crate" );
+		INFO( classname(), "Crate == \"" << crate << "\""  );
 
 	}
 

@@ -13,8 +13,6 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 	int fastAdcWest = 0;
 	int fastChWest = -1;
 
-	string crate = config.getString( nodePath + ".Crate" );
-
 
 	for ( int tube = 0; tube < 16; tube++ ){
 
@@ -86,6 +84,7 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 void VpdTriggerSlewPicoDstMaker::readParams(){
 	ifstream inf( config.getString( nodePath + ".Slewing:url" ).c_str() );
+	DEBUG( classname(), "Reading Slewing Params : " << config.getString( nodePath + ".Slewing:url" ) );
 
 	for ( int i = 0; i < 19; i ++ ){
 		for ( int j = 0; j < 10; j++){
@@ -108,7 +107,7 @@ void VpdTriggerSlewPicoDstMaker::readParams(){
 	string line;
 	while( getline( inf, line ) ){
 
-		cout << line << endl;
+		DEBUG( classname(), << line );
 		stringstream ss( line );
 
 		string boardId;
@@ -122,7 +121,7 @@ void VpdTriggerSlewPicoDstMaker::readParams(){
 			int opt;
 
 			ss >> channel >> nBins >> opt;
-			cout << "nBins " << nBins << endl;
+			DEBUG( classname(), << "nBins " << nBins );
 
 			numBins = nBins;
 			
@@ -130,7 +129,7 @@ void VpdTriggerSlewPicoDstMaker::readParams(){
 				for ( int i = 0; i < nBins; i++ ){
 					int be;
 					ss >> be;
-					cout << "[" << i << "] = " << be << endl;
+					DEBUG( classname(), << "[" << i << "] = " << be );
 					if ( "0x16" == boardId ) // east
 						eBinEdges[iEast][i] = be;
 					else if ("0x18" == boardId) // west
@@ -140,7 +139,7 @@ void VpdTriggerSlewPicoDstMaker::readParams(){
 				for ( int i = 0; i < nBins; i++ ){
 					int bc;
 					ss >> bc;
-					cout << "[" << i << "] = " << bc << endl;
+					DEBUG( classname(), << "[" << i << "] = " << bc );
 					if ( "0x16" == boardId ) // east
 						eCorrs[iEast][i] = bc;
 					else if ("0x18" == boardId) // west
