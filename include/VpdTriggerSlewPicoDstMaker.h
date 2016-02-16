@@ -42,6 +42,8 @@ protected:
 
 	string crate;
 
+	bool wantVertex = false;
+
 
 
 public:
@@ -65,6 +67,7 @@ public:
 			chain->SetBranchStatus( "*", 0 );
 			chain->SetBranchStatus( "MuEvent.mEventSummary.mPrimaryVertexPos*", 1 );
 			chain->SetBranchStatus( "MuEvent.mVpdTriggerDetector*", 1 );
+			wantVertex = true;
 		}
 		else {
 			ERROR( classname(), "COULD not make a DataAdapter" );
@@ -112,7 +115,8 @@ public:
 		data.vertexY = pico->vY();
 		data.vertexZ = pico->vZ();
 
-		if ( data.vertexZ == 0.0 ) return;
+
+		if ( wantVertex && data.vertexZ == 0.0 ) return;
 
 		fillVpdTrigger();
 
