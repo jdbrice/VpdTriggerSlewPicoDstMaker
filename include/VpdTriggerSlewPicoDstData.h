@@ -12,19 +12,18 @@ struct VpdTriggerSlewPicoDstData {
 
 	// VPD trigger side bbq electronics
 	Int_t   adcEast[kMaxChannels], 
-			tdcEast[kMaxChannels],
-			fastAdcEast, 
-			fastChEast, 
-			fastTdcEast,
-			fastPulserChEast;
+			tdcEast[kMaxChannels];
 
 
 	Int_t   adcWest[kMaxChannels], 
-			tdcWest[kMaxChannels],
-			fastAdcWest, 
-			fastChWest, 
-			fastTdcWest,
-			fastPulserChWest;
+			tdcWest[kMaxChannels];
+
+	Int_t   jadcEast[kMaxChannels], 
+			jtdcEast[kMaxChannels];
+
+
+	Int_t   jadcWest[kMaxChannels], 
+			jtdcWest[kMaxChannels];
 
 	Float_t vertexX, vertexY, vertexZ;
 

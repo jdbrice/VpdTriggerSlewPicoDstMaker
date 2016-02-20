@@ -6,20 +6,19 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 	book->cd();
 
-	int fastTdcEast = 0;
-	int fastAdcEast = 0;
-	int fastChEast = -1;
-	int fastTdcWest = 0;
-	int fastAdcWest = 0;
-	int fastChWest = -1;
+	double toCM = 0.262;
+	if ( "bbq" == crate )
+		toCM = 0.262;
 
-
+	//////////////////////////////////////////////////////////////////////
+	// Calculate the corrected values and fill tuple data
+	// 
+	DEBUG( classname(), "Crate = " << crate << ", refCorr = " << refCorr );
 	for ( int tube = 0; tube < 16; tube++ ){
-
 		
 		int adcEast = pico->adc( "east", crate, tube );
 		int tdcEast = pico->tdc( "east", crate, tube );
-
+		DEBUG( classname(), "tdcEast = " << tdcEast );
 		int adcWest = pico->adc( "west", crate, tube );
 		int tdcWest = pico->tdc( "west", crate, tube );
 
@@ -27,9 +26,21 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 		int cTdcEast = corrEast( tube, adcEast, tdcEast );
 		int cTdcWest = corrWest( tube, adcWest, tdcWest );
 
-		if ( cTdcEast > 4096 )
+		DEBUG( classname(), "ctdcEast = " << cTdcEast );
+
+		if ( pulserCh( tube ) == tube ) {
+			cTdcEast = tdcEast;
+			cTdcWest = tdcWest;
+		}
+
+		if ( adcEast < 10 )
 			cTdcEast = 0;
-		if ( cTdcWest > 4096 )
+		if ( adcWest < 10 )
+			cTdcWest = 0;
+
+		if ( cTdcEast > 3000 )
+			cTdcEast = 0;
+		if ( cTdcWest > 3000 )
 			cTdcWest = 0;
 
 		if ( cTdcEast < 300 )
@@ -37,8 +48,36 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 		if ( cTdcWest < 300 )
 			cTdcWest = 0;
 
-		cTdcEast = cTdcEast - tacOffsetEast[ tube ];
-		cTdcWest = cTdcWest - tacOffsetWest[ tube ];
+		data.jtdcEast[ tube ] = cTdcEast;
+		data.jadcEast[ tube ] = adcEast;
+
+		data.jtdcWest[ tube ] = cTdcWest;
+		data.jadcWest[ tube ] = adcWest;
+
+
+		if ( refCorr && pulserCh( tube ) != tube ){
+			DEBUG( "", "[" << tube <<"]" << pulserMeanEast[ pulserCh( tube ) ] );
+			cTdcEast = cTdcEast - (pico->tdc( "east", crate, pulserCh( tube ) ) - pulserMeanEast[ pulserCh( tube ) ] );
+			cTdcWest = cTdcWest - (pico->tdc( "west", crate, pulserCh( tube ) ) - pulserMeanWest[ pulserCh( tube ) ] );	
+		}
+
+		if ( adcEast < 10 )
+			cTdcEast = 0;
+		if ( adcWest < 10 )
+			cTdcWest = 0;
+		
+
+		if ( cTdcEast > 3000 )
+			cTdcEast = 0;
+		if ( cTdcWest > 3000 )
+			cTdcWest = 0;
+
+		if ( cTdcEast < 300 )
+			cTdcEast = 0;
+		if ( cTdcWest < 300 )
+			cTdcWest = 0;
+
+		DEBUG( classname(), "ctdcEast = " << cTdcEast );
 
 		data.tdcEast[ tube ] = cTdcEast;
 		data.adcEast[ tube ] = adcEast;
@@ -46,39 +85,94 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 		data.tdcWest[ tube ] = cTdcWest;
 		data.adcWest[ tube ] = adcWest;
 
-
-		if ( channelMask[ tube ] ){
-			book->fill( "tdcEast", tube, tdcEast );
-			book->fill( "tdcWest", tube, tdcWest );
-
-			book->fill( "tdcEastSlewCorred", tube, cTdcEast );
-			book->fill( "tdcWestSlewCorred", tube, cTdcWest );	
-
-
-			if ( cTdcEast > fastTdcEast ){
-				fastTdcEast = cTdcEast;
-				fastAdcEast = adcEast;
-				fastChEast = tube;
-			}
-
-			if ( cTdcWest > fastTdcWest ){
-				fastTdcWest = cTdcWest;
-				fastAdcWest = adcWest;
-				fastChWest = tube;
-			}
-		} // if channelMask
 	} // tube loop
 
 
-	data.fastTdcEast = fastTdcEast;
-	data.fastAdcEast = fastAdcEast;
-	data.fastChEast = fastChEast;
-	data.fastPulserChEast = pulserMap[ fastChEast ];
+	//////////////////////////////////////////////////////////////////////
+	/// Find Fastest
+	/// 
+	int fastTdcEast = -1;
+	int jfastTdcEast = -1;
+	int fastTdcWest = -1;
+	int jfastTdcWest = -1;
+	for ( int i = 0; i < 16; i++ ){
+		if ( 0 == i || 4 == i || 8 == i || 12 == i ) continue;
+		
+		if ( data.tdcEast[ i ] > fastTdcEast )
+			fastTdcEast = data.tdcEast[ i ];
+		if ( data.tdcWest[ i ] > fastTdcWest )
+			fastTdcWest = data.tdcWest[ i ];
 
-	data.fastTdcWest = fastTdcWest;
-	data.fastAdcWest = fastAdcWest;
-	data.fastChWest = fastChWest;
-	data.fastPulserChWest = pulserMap[ fastChWest ];
+		if ( data.jtdcEast[ i ] > jfastTdcEast )
+			jfastTdcEast = data.jtdcEast[ i ];
+		if ( data.jtdcWest[ i ] > jfastTdcWest )
+			jfastTdcWest = data.jtdcWest[ i ];
+	}
+
+	double l0Normal = ( jfastTdcWest - jfastTdcEast ) * toCM - pico->vZ();
+	double l0 = ( fastTdcWest - fastTdcEast ) * toCM - pico->vZ();
+	
+	book->fill( "deltaVz_Early_w_Jitter", l0Normal );
+	book->fill( "deltaVz_Early_wo_Jitter", l0 );
+
+	book->fill( "deltaVz_grefmult_Early_w_Jitter", pico->gRefMult()/10.0, l0Normal );
+	book->fill( "deltaVz_grefmult_Early_wo_Jitter", pico->gRefMult()/10.0, l0 );
+
+
+	//////////////////////////////////////////////////////////////////////
+	/// Calculate the average
+	/// 
+	int nEast = 0, nWest = 0;
+	int totalEast = 0, totalWest = 0;
+
+	int jnEast = 0, jnWest = 0;
+	int jtotalEast = 0, jtotalWest = 0;
+
+
+	for ( int i = 0; i < 16; i++ ){
+		if ( 0 == i || 4 == i || 8 == i || 12 == i ) continue;
+		
+		if ( data.tdcEast[ i ] > 300 && data.tdcEast[ i ] < 3000 && data.adcEast[ i ] > 10 ){
+			nEast++;
+			totalEast += data.tdcEast[ i ];
+		}
+
+		if ( data.tdcWest[ i ] > 300 && data.tdcWest[ i ] < 3000 && data.adcWest[ i ] > 10 ){
+			nWest++;
+			totalWest += data.tdcWest[ i ];
+		}
+
+		//////////////////////////////////////////////////////////////////////
+		/// with jitter versions
+		if ( data.jtdcEast[ i ] > 300 && data.jtdcEast[ i ] < 3000 && data.adcEast[ i ] > 10 ){
+			jnEast++;
+			jtotalEast += data.jtdcEast[ i ];
+		}
+
+		if ( data.jtdcWest[ i ] > 300 && data.jtdcWest[ i ] < 3000 && data.adcWest[ i ] > 10 ){
+			jnWest++;
+			jtotalWest += data.jtdcWest[ i ];
+		}
+	}
+
+	double avgEast = totalEast / (double) nEast;
+	double avgWest = totalWest / (double) nWest;
+
+	double javgEast = jtotalEast / (double) jnEast;
+	double javgWest = jtotalWest / (double) jnWest;
+
+	double l0Avg = ( avgWest - avgEast ) * toCM - pico->vZ();
+	double jl0Avg = ( javgWest - javgEast ) * toCM - pico->vZ();
+	
+	book->fill( "deltaVz_Avg_wo_Jitter", l0Avg );
+	book->fill( "deltaVz_Avg_w_Jitter", jl0Avg );
+
+	book->fill( "deltaVz_grefmult_Avg_wo_Jitter", pico->gRefMult()/10.0, l0Avg );
+	book->fill( "deltaVz_grefmult_Avg_w_Jitter", pico->gRefMult()/10.0, jl0Avg );
+
+
+
+
 } // fillVpdTrigger
 
 
@@ -196,19 +290,17 @@ void VpdTriggerSlewPicoDstMaker::bookTree(){
 	
 	tree->Branch("adcEast",&data.adcEast,"adcEast[16]/i");
 	tree->Branch("adcWest",&data.adcWest,"adcWest[16]/i");
+
 	tree->Branch("tdcEast",&data.tdcEast,"tdcEast[16]/i");
 	tree->Branch("tdcWest",&data.tdcWest,"tdcWest[16]/i");
 
-	tree->Branch("fastTdcEast",&data.fastTdcEast,"fastTdcEast/i");
-	tree->Branch("fastTdcWest",&data.fastTdcWest,"fastTdcWest/i");
-	tree->Branch("fastAdcEast",&data.fastAdcEast,"fastAdcEast/i");
-	tree->Branch("fastAdcWest",&data.fastAdcWest,"fastAdcWest/i");
 
-	tree->Branch("fastChEast",&data.fastChEast,"fastChEast/i");
-	tree->Branch("fastChWest",&data.fastChWest,"fastChWest/i");
+	tree->Branch("jadcEast",&data.jadcEast,"jadcEast[16]/i");
+	tree->Branch("jadcWest",&data.jadcWest,"jadcWest[16]/i");
 
-	tree->Branch("fastPulserChEast",&data.fastPulserChEast,"fastPulserChEast/i");
-	tree->Branch("fastPulserChWest",&data.fastPulserChWest,"fastPulserChWest/i");
+	tree->Branch("jtdcEast",&data.jtdcEast,"jtdcEast[16]/i");
+	tree->Branch("jtdcWest",&data.jtdcWest,"jtdcWest[16]/i");
+
 
 	tree->Branch("vertexX",&data.vertexX,"vertexX/f");
 	tree->Branch("vertexY",&data.vertexY,"vertexY/f");

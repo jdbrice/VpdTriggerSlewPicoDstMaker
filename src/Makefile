@@ -4,7 +4,7 @@ project = app
 # source suffix
 source = .cpp 
 # object files to make
-objects = Engine.o TrgEvent.o MuDst.o VpdTriggerSlewPicoDstMaker.o
+objects = Engine.o TrgEvent.o MuDst.o VpdTriggerSlewPicoDstMaker.o VpdPico.o
 
 sources = $(wildcard *.cpp)
 headers = $(wildcard ../include/*.h)

@@ -32,6 +32,13 @@ public:
 
 	virtual int fastTdc( string side = "east", string crate="bbq" ) { return 0; }
 
+	virtual Float_t vpdVz() {
+		return 0;
+	}
+
+	virtual int gRefMult(){
+		return 0;
+	}
 
 	virtual Float_t vX() {
 		return 0;

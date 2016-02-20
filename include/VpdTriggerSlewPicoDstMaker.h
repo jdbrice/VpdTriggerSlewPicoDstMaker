@@ -15,6 +15,7 @@ using namespace jdb;
 #include "VpdTriggerSlewPicoDstData.h"
 #include "TrgEvent.h"
 #include "MuDst.h"
+#include "VpdPico.h"
 
 
 class VpdTriggerSlewPicoDstMaker : public TreeAnalyzer
@@ -38,11 +39,12 @@ protected:
 	vector<int> channelMask;
 	vector<int> tacOffsetEast, tacOffsetWest;
 
-	map<int, int> pulserMap;
+	vector<int> pulserMeanEast, pulserMeanWest;
 
 	string crate;
 
 	bool wantVertex = false;
+	bool refCorr = false;
 
 
 
@@ -69,7 +71,10 @@ public:
 			chain->SetBranchStatus( "MuEvent.mVpdTriggerDetector*", 1 );
 			wantVertex = true;
 		}
-		else {
+		else if ( "vpdPico" == config.getString( nodePath + ".input.dst:treeName" ) ){
+			pico = shared_ptr<VpdPico>( new VpdPico( chain ) );
+			wantVertex = true;
+		} else {
 			ERROR( classname(), "COULD not make a DataAdapter" );
 		}
 
@@ -84,15 +89,18 @@ public:
 		tacOffsetEast = config.getIntVector( nodePath + ".TacOffsetEast", 0, 16 );
 		tacOffsetWest = config.getIntVector( nodePath + ".TacOffsetWest", 0, 16 );
 
-		pulserMap = {{0,0}, { 1,0 }, {2,0}, {3,0}, {4,4}, {5,4}, {6,4}, {7,4}, {8,8}, {9,8}, {10,8}, {11,8}, {12,12}, {13,12}, {14,12}, {15,12} };
+		pulserMeanEast = config.getIntVector( nodePath + ".PulserMeanEast", 0, 16 );
+		pulserMeanWest = config.getIntVector( nodePath + ".PulserMeanWest", 0, 16 );
 
-		string crate = config.getString( nodePath + ".Crate" );
+		crate = config.getString( nodePath + ".Crate" );
 		INFO( classname(), "Crate == \"" << crate << "\""  );
+
+		refCorr = config.getBool( nodePath + ".Reference:corr", false );
 
 	}
 
 	virtual void postMake(){
-		DEBUG( classname(), "Saveing Output" );
+		DEBUG( classname(), "Saving Output" );
 		outFile->Write();
 		outFile->Close();
 	}
@@ -111,9 +119,13 @@ public:
 		data.run = pico->runNumber();
 		data.evt = pico->eventNumber(); 
 
-		data.vertexX = pico->vX();
-		data.vertexY = pico->vY();
 		data.vertexZ = pico->vZ();
+
+		if ( fabs(data.vertexZ - pico->vpdVz()) > 3.0 ) return;
+		double px = pico->vX();
+		double py = pico->vY();
+
+		if ( sqrt( px*px + py*py ) > 1.0 ) return;
 
 
 		if ( wantVertex && data.vertexZ == 0.0 ) return;
@@ -122,6 +134,10 @@ public:
 
 		tree->Fill();
 
+	}
+
+	virtual int pulserCh( int tube ) {
+		return tube / 4 * 4;
 	}
 
 
