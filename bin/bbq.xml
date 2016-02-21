@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+	<Task name="PicoDstMaker" type="VpdTriggerSlewPicoDstMaker" config="" nodePath="VpdTriggerSlewPicoDstMaker" />
+
+	<VpdTriggerSlewPicoDstMaker>
+		<Logger globalLogLevel="info" />
+		
+		<input>
+			<dst treeName="vpdPico" url="list.lis" maxFiles="10000"/>
+		</input>
+
+		<Crate>bbq</Crate>
+		<Slewing url="/Users/danielbrandenburg/bnl/local/work/vpdCalibration/bin/run16/trigger/bbq_params.dat"/>
+		<Reference corr="true" />
+
+		<output>
+			<data>qa_bbq.root</data>
+			<tree>bbq.root</tree>
+		</output>	
+
+		<histograms>
+			<Histo name="tdcEast" title="TDC East" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC" />
+			<Histo name="tdcWest" title="TDC West" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC" />
+			
+			<Histo name="tdcEastSlewCorred" title="TDC East Slew Corrected" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC" />
+			<Histo name="tdcWestSlewCorred" title="TDC West Slew Corrected" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC" />
+
+			<Histo name="deltaVz_Early_w_Jitter" title="Earliest with Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.deltaZ" />
+			<Histo name="deltaVz_Early_wo_Jitter" title="Earliest - Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.deltaZ" />
+
+			<Histo name="deltaVz_Avg_w_Jitter" title="Average; vZ_{VPD} - vZ_{TPC};" bins_x="bins.deltaZ" />
+			<Histo name="deltaVz_Avg_wo_Jitter" title="Average - Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.deltaZ" />
+
+
+			<Histo name="deltaVz_grefmult_Early_w_Jitter" title="Earliest with Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.grefmult" bins_y="bins.deltaZ" />
+			<Histo name="deltaVz_grefmult_Early_wo_Jitter" title="Earliest - Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.grefmult" bins_y="bins.deltaZ" />
+
+			<Histo name="deltaVz_grefmult_Avg_w_Jitter" title="Average; vZ_{VPD} - vZ_{TPC};" bins_x="bins.grefmult" bins_y="bins.deltaZ" />
+			<Histo name="deltaVz_grefmult_Avg_wo_Jitter" title="Average - Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.grefmult" bins_y="bins.deltaZ" />
+
+		</histograms>
+
+		<ChannelMask>0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1 </ChannelMask>
+		<PulserMeanEast>2083, 0, 0, 0, 2388, 0, 0, 0, 2348, 0, 0, 0, 2087, 0, 0, 0</PulserMeanEast>
+		<PulserMeanWest>2440, 0, 0, 0, 2332, 0, 0, 0, 2292, 0, 0, 0, 2172, 0, 0, 0</PulserMeanWest>
+
+	</VpdTriggerSlewPicoDstMaker>
+
+	<bins>
+		<deltaZ width="0.25" min="-30" max="30" />
+		<grefmult width="1" min="1" max="60" />
+	</bins>
+
+</config>
