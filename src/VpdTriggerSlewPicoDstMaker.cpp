@@ -42,13 +42,13 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 		// Save the non-jitter corrected values
 		data.jadcEast[ tube ] = adcEast;
-		if ( false == goodHit( adcEast, cTdcEast ) )
+		if ( false == goodHitE( adcEast, cTdcEast ) )
 			data.jtdcEast[ tube ] = 0;
 		else 	
 			data.jtdcEast[ tube ] = cTdcEast;
 		
 		data.jadcWest[ tube ] = adcWest;
-		if ( false == goodHit( adcWest, cTdcWest ) )
+		if ( false == goodHitW( adcWest, cTdcWest ) )
 			data.jtdcWest[ tube ] = 0;
 		else 	
 			data.jtdcWest[ tube ] = cTdcWest;
@@ -61,9 +61,9 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 		}
 
-		if ( false == goodHit( adcEast, cTdcEast ) )
+		if ( false == goodHitE( adcEast, cTdcEast ) )
 			cTdcEast = 0;
-		if ( false == goodHit( adcWest, cTdcWest ) )
+		if ( false == goodHitW( adcWest, cTdcWest ) )
 			cTdcWest = 0;
 
 		DEBUG( classname(), "ctdcEast = " << cTdcEast );
@@ -123,7 +123,7 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 	for ( int i = 0; i < 16; i++ ){
 		if ( 0 == i || 4 == i || 8 == i || 12 == i ) continue;
 		
-		if ( goodHit( data.adcEast[ i ], data.tdcEast[ i ] ) ){
+		if ( goodHitE( data.adcEast[ i ], data.tdcEast[ i ] ) ){
 		//if ( data.tdcEast[ i ] > 300 && data.tdcEast[ i ] < 3000 && data.adcEast[ i ] > 10 ){
 			nEast++;
 			totalEast += data.tdcEast[ i ];
@@ -137,7 +137,7 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 
 		// if ( data.tdcWest[ i ] > 300 && data.tdcWest[ i ] < 3000 && data.adcWest[ i ] > 10 ){
-		if ( goodHit( data.adcWest[ i ], data.tdcWest[ i ] ) ){
+		if ( goodHitW( data.adcWest[ i ], data.tdcWest[ i ] ) ){
 			nWest++;
 			totalWest += data.tdcWest[ i ];
 			if ( nWest == 2 )
@@ -150,13 +150,13 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 		//////////////////////////////////////////////////////////////////////
 		/// with jitter versions
-		if ( goodHit( data.jadcEast[ i ], data.jtdcEast[ i ] ) ){
+		if ( goodHitE( data.jadcEast[ i ], data.jtdcEast[ i ] ) ){
 			jnEast++;
 			jtotalEast += data.jtdcEast[ i ];
 			jtotalAdcEast += data.jadcEast[ i ];
 		}
 
-		if ( goodHit( data.jadcWest[ i ], data.jtdcWest[ i ] ) ){
+		if ( goodHitW( data.jadcWest[ i ], data.jtdcWest[ i ] ) ){
 			jnWest++;
 			jtotalWest += data.jtdcWest[ i ];
 			jtotalAdcWest += data.jadcWest[ i ];
@@ -179,14 +179,44 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 		return;
 	}
 
-	book->fill( "On_Off_nGoodHitWest", pico->nGood( "west" ), jnWest );
-	book->fill( "On_Off_nGoodHitEast", pico->nGood( "east" ), jnEast );
+	bool JITTER_CORR = true;
+
+	int offNWest = jnWest;
+	int offNEast = jnEast;
+	int offTotalEast = jtotalEast;
+	int offTotalWest = jtotalWest;
+
+	if ( JITTER_CORR ){
+		offNEast = nEast;
+		offNWest = nWest;
+		offTotalEast = totalEast;
+		offTotalWest = totalWest;
+	}
+
+	book->fill( "On_Off_nGoodHitWest", pico->nGood( "west" ), offNWest );
+	book->fill( "On_Off_nGoodHitEast", pico->nGood( "east" ), offNEast );
 	
-	book->fill( "On_Off_sumTacWest", pico->sumTAC( "west" ), jtotalWest );
-	book->fill( "On_Off_sumTacEast", pico->sumTAC( "east" ), jtotalEast );
+	book->fill( "On_Off_sumTacWest", pico->sumTAC( "west" ), offTotalWest );
+	book->fill( "On_Off_sumTacEast", pico->sumTAC( "east" ), offTotalEast );
 
 	book->fill( "On_Off_sumAdcWest", pico->sumADC( "west" ), jtotalAdcWest );
 	book->fill( "On_Off_sumAdcEast", pico->sumADC( "east" ), jtotalAdcEast );
+
+	int tjtotalAdcWest = jtotalAdcWest & 0xfff;
+	if ( jtotalAdcWest > 4095 )
+		tjtotalAdcWest = 4095;
+	int tjtotalAdcEast = jtotalAdcEast & 0xfff;
+	if ( jtotalAdcEast > 4095 )
+		tjtotalAdcEast = 4095;
+
+	book->fill( "On_Off_tsumAdcWest", pico->sumADC( "west" ), tjtotalAdcWest );
+	book->fill( "On_Off_tsumAdcEast", pico->sumADC( "east" ), tjtotalAdcEast );
+
+	if ( tjtotalAdcEast != pico->sumADC( "east" ) ){
+		book->fill( "On_Off_sumAdcEastWrong", pico->sumADC( "east" ), jtotalAdcEast );
+	}
+
+	book->fill( "On_tsumAdcEast", pico->sumADC( "east" ));
 
 	book->fill( "On_Off_avgEast", (pico->sumTAC( "east" ) / (pico->nGood( "east" ))), jtotalEast / jnEast );
 	book->fill( "On_Off_avgWest", (pico->sumTAC( "west" ) / (pico->nGood( "west" ))), jtotalWest / jnWest );
@@ -249,16 +279,16 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 	book->fill( name, ( (totalWest8 / 8.0) - (totalEast8 / 8.0) ) * toCM - pico->vZ() );
 
 
-	for ( int i = 0; i < 16; i++ ){
-		if ( 0 == i || 4 == i || 8 == i || 12 == i ) continue;
-		if ( data.jtdcEast[ i ] > TAC_min && data.jtdcEast[ 1 ] > TAC_min )
-			book->fill( "deltaTAC_East", i, data.jtdcEast[ i ] - data.jtdcEast[ 1 ] );
+	// for ( int i = 0; i < 16; i++ ){
+	// 	if ( 0 == i || 4 == i || 8 == i || 12 == i ) continue;
+	// 	if ( data.jtdcEast[ i ] > TAC_min && data.jtdcEast[ 1 ] > TAC_min )
+	// 		book->fill( "deltaTAC_East", i, data.jtdcEast[ i ] - data.jtdcEast[ 1 ] );
 		
-		if ( data.jtdcWest[ i ] > TAC_min && data.jtdcWest[ 2 ] > TAC_min )
-			book->fill( "deltaTAC_West", i, data.jtdcWest[ i ] - data.jtdcWest[ 2 ] );
-	}
+	// 	if ( data.jtdcWest[ i ] > TAC_min && data.jtdcWest[ 2 ] > TAC_min )
+	// 		book->fill( "deltaTAC_West", i, data.jtdcWest[ i ] - data.jtdcWest[ 2 ] );
+	// }
 
-	book->fill( "onlineL0", jnEast * pico->fastTdc( "west" ) - jnWest * pico->fastTdc( "east" ) );
+	// book->fill( "onlineL0", jnEast * pico->fastTdc( "west" ) - jnWest * pico->fastTdc( "east" ) );
 
 
 

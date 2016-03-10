@@ -50,7 +50,8 @@ protected:
 
 	map< string, map<int, int> > pulserMeans;
 
-	int TAC_min, TAC_max, ADC_th;
+	int E_TAC_min, E_TAC_max, E_ADC_th;
+	int W_TAC_min, W_TAC_max, W_ADC_th;
 
 
 
@@ -120,10 +121,17 @@ public:
 		}
 
 		// Load in the TAC and ADC thresholds
-		TAC_min = config.getInt( nodePath + ".GoodHit:TAC_min", 180 );
-		TAC_max = config.getInt( nodePath + ".GoodHit:TAC_max", 3000 );
-		ADC_th = config.getInt( nodePath + ".GoodHit:ADC_th", 10 );
-		INFO( classname(), "Thresholds TAC_min=" << TAC_min <<", TAC_max=" << TAC_max << ", ADC_th=" << ADC_th );
+		E_TAC_min = config.getInt( nodePath + ".GoodHitE:TAC_min", 180 );
+		E_TAC_max = config.getInt( nodePath + ".GoodHitE:TAC_max", 3000 );
+		E_ADC_th = config.getInt( nodePath + ".GoodHitE:ADC_th", 10 );
+
+		W_TAC_min = config.getInt( nodePath + ".GoodHitW:TAC_min", 180 );
+		W_TAC_max = config.getInt( nodePath + ".GoodHitW:TAC_max", 3000 );
+		W_ADC_th = config.getInt( nodePath + ".GoodHitW:ADC_th", 10 );
+
+
+		INFO( classname(), "Thresholds EAST TAC_min=" << E_TAC_min <<", TAC_max=" << E_TAC_max << ", ADC_th=" << E_ADC_th );
+		INFO( classname(), "Thresholds WEST TAC_min=" << W_TAC_min <<", TAC_max=" << W_TAC_max << ", ADC_th=" << W_ADC_th );
 
 
 		// test case
@@ -195,8 +203,13 @@ public:
 	}
 
 
-	bool goodHit( int adc, int tac ){
-		if ( adc <= ADC_th || tac >= TAC_max || tac < TAC_min)
+	bool goodHitW( int adc, int tac ){
+		if ( adc <= W_ADC_th || tac >= W_TAC_max || tac < W_TAC_min)
+			return false;
+		return true;
+	}
+	bool goodHitE( int adc, int tac ){
+		if ( adc <= E_ADC_th || tac >= E_TAC_max || tac < E_TAC_min)
 			return false;
 		return true;
 	}
