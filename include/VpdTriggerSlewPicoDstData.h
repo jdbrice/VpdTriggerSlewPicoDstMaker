@@ -25,7 +25,7 @@ struct VpdTriggerSlewPicoDstData {
 	Int_t   jadcWest[kMaxChannels], 
 			jtdcWest[kMaxChannels];
 
-	Float_t vertexX, vertexY, vertexZ;
+	Float_t vertexX, vertexY, vertexZ, vpdVz;
 
 };
 

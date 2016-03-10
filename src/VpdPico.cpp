@@ -101,6 +101,7 @@ void VpdPico::Init(TTree *tree)
 
    fChain->SetBranchAddress("fUniqueID", &fUniqueID, &b_event_fUniqueID);
    fChain->SetBranchAddress("fBits", &fBits, &b_event_fBits);
+   fChain->SetBranchAddress("triggerIds", &triggerIds, &b_event_triggerIds);
    fChain->SetBranchAddress("mxqTdcEast[16]", mxqTdcEast, &b_event_mxqTdcEast);
    fChain->SetBranchAddress("mxqTdcWest[16]", mxqTdcWest, &b_event_mxqTdcWest);
    fChain->SetBranchAddress("mxqAdcEast[16]", mxqAdcEast, &b_event_mxqAdcEast);
@@ -109,6 +110,14 @@ void VpdPico::Init(TTree *tree)
    fChain->SetBranchAddress("bbqTdcWest[16]", bbqTdcWest, &b_event_bbqTdcWest);
    fChain->SetBranchAddress("bbqAdcEast[16]", bbqAdcEast, &b_event_bbqAdcEast);
    fChain->SetBranchAddress("bbqAdcWest[16]", bbqAdcWest, &b_event_bbqAdcWest);
+   fChain->SetBranchAddress("bbqEarliestEast", &bbqEarliestEast, &b_event_bbqEarliestEast);
+   fChain->SetBranchAddress("bbqEarliestWest", &bbqEarliestWest, &b_event_bbqEarliestWest);
+   fChain->SetBranchAddress("mxqEarliestEast", &mxqEarliestEast, &b_event_mxqEarliestEast);
+   fChain->SetBranchAddress("mxqEarliestWest", &mxqEarliestWest, &b_event_mxqEarliestWest);
+   fChain->SetBranchAddress("bbqSumTacEast", &bbqSumTacEast, &b_event_bbqSumTacEast);
+   fChain->SetBranchAddress("bbqSumTacWest", &bbqSumTacWest, &b_event_bbqSumTacWest);
+   fChain->SetBranchAddress("bbqNGoodHitEast", &bbqNGoodHitEast, &b_event_bbqNGoodHitEast);
+   fChain->SetBranchAddress("bbqNGoodHitWest", &bbqNGoodHitWest, &b_event_bbqNGoodHitWest);
    fChain->SetBranchAddress("runId", &runId, &b_event_runId);
    fChain->SetBranchAddress("vpdZ", &vpdZ, &b_event_vpdZ);
    fChain->SetBranchAddress("vtx.mX1", &vtx_mX1, &b_event_vtx_mX1);

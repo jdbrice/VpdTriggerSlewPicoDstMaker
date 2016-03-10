@@ -2785,6 +2785,10 @@ public :
 	virtual Int_t eventNumber(){
 		return MuEvent_mEventInfo_mId[0];
 	}
+
+	virtual Int_t trigger(){
+		return 0;
+	}
 };
 
 #endif

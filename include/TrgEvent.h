@@ -29,27 +29,33 @@ public :
    UInt_t          npre;
    UInt_t          npost;
    UInt_t          nsum;
-   UShort_t        Vpd[3][64];   //[nsum]
-   UShort_t        VpdHi[3][64];   //[nsum]
-   UShort_t        bbqEastVpd[3][32];   //[nsum]
-   UShort_t        bbqWestVpd[3][32];   //[nsum]
-   UShort_t        fastBbqEastVpd[3];   //[nsum]
-   UShort_t        fastBbqWestVpd[3];   //[nsum]
-   UShort_t        mxqEastVpd[3][32];   //[nsum]
-   UShort_t        mxqWestVpd[3][32];   //[nsum]
-   UShort_t        fastMxqEastVpd[3];   //[nsum]
-   UShort_t        fastMxqWestVpd[3];   //[nsum]
-   UShort_t        tofMult[3];   //[nsum]
-   UShort_t        tofTrayMult[3][120];   //[nsum]
-   UShort_t        MT001[3][32];   //[nsum]
-   UShort_t        MT002[3][32];   //[nsum]
-   UShort_t        MT003[3][32];   //[nsum]
-   UShort_t        MT004[3][32];   //[nsum]
-   UShort_t        MT005[3][32];   //[nsum]
-   UShort_t        MT006[3][32];   //[nsum]
-   UShort_t        MT007[3][32];   //[nsum]
-   UShort_t        MT008[3][32];   //[nsum]
-   UChar_t         MtdDsm[3][32];   //[nsum]
+   UShort_t        Vpd[1][64];   //[nsum]
+   UShort_t        VpdHi[1][64];   //[nsum]
+   UShort_t        bbqEastVpd[1][32];   //[nsum]
+   UShort_t        bbqWestVpd[1][32];   //[nsum]
+   UShort_t        fastBbqEastVpd[1];   //[nsum]
+   UShort_t        fastBbqWestVpd[1];   //[nsum]
+   UShort_t        sumBbqEastVpd[1];   //[nsum]
+   UShort_t        sumBbqWestVpd[1];   //[nsum]
+   UShort_t        sumADCBbqEastVpd[1];   //[nsum]
+   UShort_t        sumADCBbqWestVpd[1];   //[nsum]
+   UShort_t        nGoodBbqEastVpd[1];   //[nsum]
+   UShort_t        nGoodBbqWestVpd[1];   //[nsum]
+   UShort_t        mxqEastVpd[1][32];   //[nsum]
+   UShort_t        mxqWestVpd[1][32];   //[nsum]
+   UShort_t        fastMxqEastVpd[1];   //[nsum]
+   UShort_t        fastMxqWestVpd[1];   //[nsum]
+   UShort_t        tofMult[1];   //[nsum]
+   UShort_t        tofTrayMult[1][120];   //[nsum]
+   UShort_t        MT001[1][32];   //[nsum]
+   UShort_t        MT002[1][32];   //[nsum]
+   UShort_t        MT003[1][32];   //[nsum]
+   UShort_t        MT004[1][32];   //[nsum]
+   UShort_t        MT005[1][32];   //[nsum]
+   UShort_t        MT006[1][32];   //[nsum]
+   UShort_t        MT007[1][32];   //[nsum]
+   UShort_t        MT008[1][32];   //[nsum]
+   UChar_t         MtdDsm[1][32];   //[nsum]
    UShort_t        DsmTF201Ch[8];
    UShort_t        lastDsmBit[8];
 
@@ -64,6 +70,12 @@ public :
    TBranch        *b_bbqWestVpd;   //!
    TBranch        *b_fastBbqEastVpd;   //!
    TBranch        *b_fastBbqWestVpd;   //!
+   TBranch        *b_sumBbqEastVpd;   //!
+   TBranch        *b_sumBbqWestVpd;   //!
+   TBranch        *b_sumADCBbqEastVpd;   //!
+   TBranch        *b_sumADCBbqWestVpd;   //!
+   TBranch        *b_nGoodBbqEastVpd;   //!
+   TBranch        *b_nGoodBbqWestVpd;   //!
    TBranch        *b_mxqEastVpd;   //!
    TBranch        *b_mxqWestVpd;   //!
    TBranch        *b_fastMxqEastVpd;   //!
@@ -93,6 +105,34 @@ public :
    virtual void     Show(Long64_t entry = -1);
 
 
+   virtual int sumTAC( string side = "east" ){
+      if ( "east" == side || "East" == side || "EAST" == side ){
+         return sumBbqEastVpd[ iPrePost ];
+      }
+      if ( "west" == side || "West" == side || "WEST" == side ){
+         return sumBbqWestVpd[ iPrePost ];  
+      }
+      return 0;
+   }
+
+   virtual int sumADC( string side = "east" ){
+      if ( "east" == side || "East" == side || "EAST" == side ){
+         return sumADCBbqEastVpd[ iPrePost ];
+      }
+      if ( "west" == side || "West" == side || "WEST" == side ){
+         return sumADCBbqWestVpd[ iPrePost ];  
+      }
+      return 0;
+   }
+
+   virtual int nGood( string side = "east" ) {
+      if ( "west" == side || "West" == side || "WEST" == side ){
+         return nGoodBbqWestVpd[ iPrePost ];
+      } else if ( "east" == side || "East" == side || "EAST" == side ){
+         return nGoodBbqEastVpd[ iPrePost ];
+      }
+      return 0;
+   }
 
    virtual int tdc( string side = "east", string crate="bbq", int tube = 0 ) { 
       
@@ -100,16 +140,16 @@ public :
 
       if ( "east" == side || "East" == side || "EAST" == side ){
          if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
-            return bbqEastVpd[0][ iTDC ];
+            return bbqEastVpd[iPrePost][ iTDC ];
          } else {
-            return mxqEastVpd[0][ iTDC ];
+            return mxqEastVpd[iPrePost][ iTDC ];
          }
       }
       if ( "west" == side || "West" == side || "WEST" == side ){
          if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
-            return bbqWestVpd[0][ iTDC ];
+            return bbqWestVpd[iPrePost][ iTDC ];
          } else {
-            return mxqWestVpd[0][ iTDC ];
+            return mxqWestVpd[iPrePost][ iTDC ];
          }
       }
       return 0;
@@ -118,16 +158,16 @@ public :
       int iADC = tube + tube / 4 * 4;
       if ( "east" == side || "East" == side || "EAST" == side ){
          if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
-            return bbqEastVpd[0][ iADC ];
+            return bbqEastVpd[iPrePost][ iADC ];
          } else {
-            return mxqEastVpd[0][ iADC ];
+            return mxqEastVpd[iPrePost][ iADC ];
          }
       }
       if ( "west" == side || "West" == side || "WEST" == side ){
          if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
-            return bbqWestVpd[0][ iADC ];
+            return bbqWestVpd[iPrePost][ iADC ];
          } else {
-            return mxqWestVpd[0][ iADC ];
+            return mxqWestVpd[iPrePost][ iADC ];
          }
       }
       return 0;
@@ -136,18 +176,22 @@ public :
    virtual int fastTdc( string side = "east", string crate="bbq" ) {
       if ( "east" == side || "East" == side || "EAST" == side ){
          if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
-            return fastMxqEastVpd[0];
+            return fastMxqEastVpd[iPrePost];
          } else {
-            return fastMxqEastVpd[0];
+            return fastMxqEastVpd[iPrePost];
          }
       }
       if ( "west" == side || "West" == side || "WEST" == side ){
          if ( "bbq" == crate || "Bbq" == crate || "BBQ" == crate ){
-            return fastBbqWestVpd[0];
+            return fastBbqWestVpd[iPrePost];
          } else {
-            return fastMxqWestVpd[0];
+            return fastMxqWestVpd[iPrePost];
          }
       }
+      return 0;
+   }
+
+   virtual Int_t trigger(){
       return 0;
    }
 

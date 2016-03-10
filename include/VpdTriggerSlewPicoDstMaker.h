@@ -40,11 +40,17 @@ protected:
 	vector<int> tacOffsetEast, tacOffsetWest;
 
 	vector<int> pulserMeanEast, pulserMeanWest;
+	vector<int> deltaTACEast, deltaTACWest;
 
 	string crate;
 
 	bool wantVertex = false;
 	bool refCorr = false;
+
+
+	map< string, map<int, int> > pulserMeans;
+
+	int TAC_min, TAC_max, ADC_th;
 
 
 
@@ -61,8 +67,12 @@ public:
 	virtual void initialize(){
 	
 
-		if ( "trgEvent" == config.getString( nodePath + ".input.dst:treeName" ) )
+		if ( "trgEvent" == config.getString( nodePath + ".input.dst:treeName" ) ){
 			pico = shared_ptr<TrgEvent>( new TrgEvent( chain ) );
+
+			INFO( classname(), "iPrePost == " << config.getInt( nodePath + ".iPrePost", 0 ) );
+			pico->setiPrePost( config.getInt( nodePath + ".iPrePost", 0 ) );
+		}
 		else if ( "MuDst" == config.getString( nodePath + ".input.dst:treeName" ) ){
 			pico = shared_ptr<MuDst>( new MuDst( chain ) );
 
@@ -92,10 +102,45 @@ public:
 		pulserMeanEast = config.getIntVector( nodePath + ".PulserMeanEast", 0, 16 );
 		pulserMeanWest = config.getIntVector( nodePath + ".PulserMeanWest", 0, 16 );
 
+		deltaTACEast = config.getIntVector( nodePath + ".DeltaTACEast", 0, 16 );
+		deltaTACWest = config.getIntVector( nodePath + ".DeltaTACWest", 0, 16 );
+
 		crate = config.getString( nodePath + ".Crate" );
 		INFO( classname(), "Crate == \"" << crate << "\""  );
 
 		refCorr = config.getBool( nodePath + ".Reference:corr", false );
+
+
+		for ( string sd : { "East", "West" } ){
+			for ( int ch : { 0, 4, 8, 12 } ){
+				string name = sd + "_" +ts(ch);
+				map<int, int> temp = config.getIntMap( "Pulser_" + name );
+				pulserMeans[ name ] = temp;
+			}
+		}
+
+		// Load in the TAC and ADC thresholds
+		TAC_min = config.getInt( nodePath + ".GoodHit:TAC_min", 180 );
+		TAC_max = config.getInt( nodePath + ".GoodHit:TAC_max", 3000 );
+		ADC_th = config.getInt( nodePath + ".GoodHit:ADC_th", 10 );
+		INFO( classname(), "Thresholds TAC_min=" << TAC_min <<", TAC_max=" << TAC_max << ", ADC_th=" << ADC_th );
+
+
+		// test case
+		INFO( classname(), "Mean East 0[ 17047044 ] = " << pulserMeans[ "East_0" ][ 17047044 ]  );
+
+	}
+
+	virtual void preEventLoop(){
+		TreeAnalyzer::preEventLoop();
+
+		for ( int nE : { 2, 4, 8 } ){
+			for ( int nW : { 2, 4, 8 } ){
+				string name = "deltaVz_nE" + ts( nE ) + "_nW" + ts(nW);
+				book->clone( "deltaVz_Avg_wo_Jitter", name );		
+			}
+		}
+		
 
 	}
 
@@ -107,6 +152,13 @@ public:
 
 
 	virtual bool keepEvent( ){
+
+
+		// if ( pico->trigger() & ( 1 << 1 ) )
+		// 	return true;
+		// else 
+		// 	return false;
+
 		return true;
 	}
 
@@ -120,6 +172,8 @@ public:
 		data.evt = pico->eventNumber(); 
 
 		data.vertexZ = pico->vZ();
+		data.vpdVz = pico->vpdVz();
+
 
 		if ( fabs(data.vertexZ - pico->vpdVz()) > 3.0 ) return;
 		double px = pico->vX();
@@ -127,7 +181,7 @@ public:
 
 		if ( sqrt( px*px + py*py ) > 1.0 ) return;
 
-
+		book->fill( "events", 1 );
 		if ( wantVertex && data.vertexZ == 0.0 ) return;
 
 		fillVpdTrigger();
@@ -140,6 +194,12 @@ public:
 		return tube / 4 * 4;
 	}
 
+
+	bool goodHit( int adc, int tac ){
+		if ( adc <= ADC_th || tac >= TAC_max || tac < TAC_min)
+			return false;
+		return true;
+	}
 
 	
 

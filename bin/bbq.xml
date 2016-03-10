@@ -7,17 +7,23 @@
 		<Logger globalLogLevel="info" />
 		
 		<input>
-			<dst treeName="vpdPico" url="list.lis" maxFiles="10000"/>
+			<dst treeName="trgEvent" url="trg17066041.lis" maxFiles="10000"/>
 		</input>
 
 		<Crate>bbq</Crate>
 		<Slewing url="/Users/danielbrandenburg/bnl/local/work/vpdCalibration/bin/run16/trigger/bbq_params.dat"/>
 		<Reference corr="true" />
 
+		<!-- Only used by trgEvent tree -->
+		<iPrePost>0</iPrePost>
+
 		<output>
-			<data>qa_bbq.root</data>
-			<tree>bbq.root</tree>
-		</output>	
+			<data>17066041/qa_bbq.root</data>
+			<tree>17066041/bbq.root</tree>
+		</output>
+
+
+		<GoodHit TAC_min="180" TAC_max="3000" ADC_th="10" />
 
 		<histograms>
 			<Histo name="tdcEast" title="TDC East" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC" />
@@ -25,6 +31,9 @@
 			
 			<Histo name="tdcEastSlewCorred" title="TDC East Slew Corrected" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC" />
 			<Histo name="tdcWestSlewCorred" title="TDC West Slew Corrected" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC" />
+
+			<Histo name="deltaTAC_East" title="TDC East - ref" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC_diff" />
+			<Histo name="deltaTAC_West" title="TDC West - ref" nBins_x="16" min_x="0" max_x="16" bins_y="bins.TDC_diff" />
 
 			<Histo name="deltaVz_Early_w_Jitter" title="Earliest with Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.deltaZ" />
 			<Histo name="deltaVz_Early_wo_Jitter" title="Earliest - Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.deltaZ" />
@@ -39,17 +48,75 @@
 			<Histo name="deltaVz_grefmult_Avg_w_Jitter" title="Average; vZ_{VPD} - vZ_{TPC};" bins_x="bins.grefmult" bins_y="bins.deltaZ" />
 			<Histo name="deltaVz_grefmult_Avg_wo_Jitter" title="Average - Jitter; vZ_{VPD} - vZ_{TPC};" bins_x="bins.grefmult" bins_y="bins.deltaZ" />
 
+
+			<Histo name="deltaVz_nTubes_Avg_wo_Jitter" title="Average - Jitter; nEast + nWest; vZ_{VPD} - vZ_{TPC}" bins_x="bins.nTubes" bins_y="bins.deltaZ" />
+
+			<Histo name="l0Vertex" title="l0Vertex; [TAC diff]" bins_x="bins.vZ" />
+
+			<Histo name="l0On_Diff" title="l0Vertex; [TAC diff]" bins_x="bins.TDC_diff" />
+			<Histo name="l0Off_Diff" title="l0Vertex; [TAC diff]" bins_x="bins.TDC_diff" />
+			
+			<Histo name="On_Off_sumTacWest" title="Sum TAC West; Online; Offline" bins_x="bins.SUM_TAC" bins_y="bins.SUM_TAC"  />
+			<Histo name="On_Off_sumTacEast" title="Sum TAC East; Online; Offline" bins_x="bins.SUM_TAC" bins_y="bins.SUM_TAC"  />
+
+			<Histo name="On_Off_sumAdcWest" title="Sum ADC West; Online; Offline" bins_x="bins.SUM_ADC" bins_y="bins.SUM_ADC"  />
+			<Histo name="On_Off_sumAdcEast" title="Sum ADC East; Online; Offline" bins_x="bins.SUM_ADC" bins_y="bins.SUM_ADC"  />
+
+
+			<Histo name="On_Off_nGoodHitWest" title="N Good Hits West; Online; Offline" bins_x="bins.tubes" bins_y="bins.tubes"  />
+			<Histo name="On_Off_nGoodHitEast" title="N Good Hits East; Online; Offline" bins_x="bins.tubes" bins_y="bins.tubes" />
+
+			<Histo name="On_Off_sumTacEast_div_nEast" title="AVG TAC East; Online; Offline" bins_x="bins.AVG_TAC" bins_y="bins.AVG_TAC"  />
+			
+			<Histo name="On_Off_avgEast" title="AVG TAC East; Online; Offline" bins_x="bins.AVG_TAC" bins_y="bins.AVG_TAC"  />
+			<Histo name="On_Off_avgWest" title="AVG TAC West; Online; Offline" bins_x="bins.AVG_TAC" bins_y="bins.AVG_TAC"  />
+
+			<Histo name="On_Off_avgEast_equalN" title="AVG TAC East ( nOnline = nOffline ); Online; Offline" bins_x="bins.AVG_TAC" bins_y="bins.AVG_TAC"  />
+			<Histo name="On_Off_avgWest_equalN" title="AVG TAC West ( nOnline = nOffline ); Online; Offline" bins_x="bins.AVG_TAC" bins_y="bins.AVG_TAC"  />
+
+
+			<Histo name="Avg_wo_Jitter_grefmult_nTubes" title="; gRefMult/10; nTubes;" bins_x="bins.grefmult" bins_y="bins.nTubes" />
+
+			<Histo name="events" title="events" nBins="20" min="0" max="20" />
+
+			<Histo name="onlineL0" title="online" width="2" min="-4000" max="4000" />
+
+			<Histo name="int_sumTdcEast" title="SumTAC East Event Integrity" width="1" min="0" max="10" />
+			<Histo name="int_sumTdcWest" title="SumTAC West Event Integrity" width="1" min="0" max="10" />
+			
+			<Histo name="int_sumAdcEast" title="SumADC East Event Integrity" width="1" min="0" max="10" />
+			<Histo name="int_sumAdcWest" title="SumADC West Event Integrity" width="1" min="0" max="10" />
+			<Histo name="sumTdcEastWrong" title="diff sumTAC East" width="1" min="-4096" max="4096" />
+			<Histo name="sumTdcEastWrong2" title="diff sumTAC East" width="1" min="-4096" max="4096" />
+
+
 		</histograms>
 
 		<ChannelMask>0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1 </ChannelMask>
-		<PulserMeanEast>2083, 0, 0, 0, 2388, 0, 0, 0, 2348, 0, 0, 0, 2087, 0, 0, 0</PulserMeanEast>
-		<PulserMeanWest>2440, 0, 0, 0, 2332, 0, 0, 0, 2292, 0, 0, 0, 2172, 0, 0, 0</PulserMeanWest>
+		<!-- <PulserMeanEast>1058, 0, 0, 0, 1337, 0, 0, 0, 1286, 0, 0, 0, 1059, 0, 0, 0</PulserMeanEast> -->
+		<!-- <PulserMeanWest>1430, 0, 0, 0, 1325, 0, 0, 0, 1238, 0, 0, 0, 1167, 0, 0, 0</PulserMeanWest> -->
+
+		<PulserMeanEast>3000, 0, 0, 0, 3000, 0, 0, 0, 3000, 0, 0, 0, 3000, 0, 0, 0</PulserMeanEast>
+		<PulserMeanWest>3000, 0, 0, 0, 3000, 0, 0, 0, 3000, 0, 0, 0, 3000, 0, 0, 0</PulserMeanWest>
+
+
+		<!-- <DeltaTACEast>0, 0, -53.7965, 43.9067, 0, -4.40241, -43.4755, 32.1676, 0, 0.471018, -49.5763, 34.0887, 0, 3.94295, -52.7454, 40.5133</DeltaTACEast> -->
+		<!-- <DeltaTACWest>0, 0, 0, 91.1242, 0, 55.5432, 20.1635, 104.399, 0, 43.9832, -1.39214, 88.2644, 0, 44.5938, 5.25486, 89.0697</DeltaTACWest> -->
+
 
 	</VpdTriggerSlewPicoDstMaker>
 
 	<bins>
+		<SUM_TAC width="10" min="1" max="20000" />
+		<SUM_ADC width="2" min="1" max="5000" />
+		<AVG_TAC width="10" min="1" max="4000" />
+		<TDC width="2" min="1" max="2000" />
+		<TDC_diff width="2" min="-2000" max="2000" />
 		<deltaZ width="0.25" min="-30" max="30" />
+		<vZ width="1" min="-300" max="300" />
 		<grefmult width="1" min="1" max="60" />
+		<nTubes width="1" min="1" max="26" />
+		<tubes width="1" min="0" max="16" />
 	</bins>
 
 </config>
