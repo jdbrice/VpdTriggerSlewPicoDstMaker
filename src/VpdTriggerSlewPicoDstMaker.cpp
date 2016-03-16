@@ -137,19 +137,12 @@ void VpdTriggerSlewPicoDstMaker::megabyteChecker(){
 	// book->cd( "megabyteChecker" );
 
 
-
-	int run = pico->runNumber();
-
-	string str = chain->GetFile()->GetName();
+	// this is the run# (filenames like "run17075040.1.dat.root")
 	string dir = chain->GetFile()->GetName();
 	dir = dir.substr(64, 11);
 
 	book->cd( dir );
 	if ( !book->exists( "On_Off_nGoodHitWest" ) ){
-
-		// string str = chain->GetFile()->GetName();
-
-		// ERROR( classname(), str.substr(64, 11) );
 
 		book->clone( "", "On_Off_nGoodHitWest", dir, "On_Off_nGoodHitWest" );
 		book->clone( "", "On_Off_nGoodHitEast", dir, "On_Off_nGoodHitEast" );
@@ -254,9 +247,6 @@ void VpdTriggerSlewPicoDstMaker::megabyteChecker(){
 	book->fill( "On_Off_sumAdcEast", pico->sumADC( "east" ), ttotalADCEast );
 
 
-
-	// cout << "total adcWest = " << totalADCWest << ", " << pico->sumADC( "west" )<< endl;
-
 	book->fill( "int_sumTacEast", pico->sumTAC( "east" ) == totalEast );
 	book->fill( "int_sumTacWest", pico->sumTAC( "west" ) == totalWest );
 
@@ -270,23 +260,6 @@ void VpdTriggerSlewPicoDstMaker::megabyteChecker(){
 	perfect = ( pico->sumTAC( "east" ) == totalEast && pico->sumTAC( "west" ) == totalWest && pico->sumADC( "east" ) == totalADCEast && pico->sumADC( "west" ) == totalADCWest && pico->nGood( "east" ) == nEast && pico->nGood( "west" ) == nWest );
 	book->fill( "int_All", perfect );
 
-
-	// if ( pico->nGood( "east" ) != nEast ){
-	// 	ERROR( classname(), "MISMATCH nEast BYTE" );
-	// }
-	// if ( pico->nGood( "west" ) != nWest ){
-	// 	ERROR( classname(), "MISMATCH nWest BYTE" );
-	// }
-	// if ( 	pico->sumTAC( "west" ) != totalWest ||
-	// 		pico->sumTAC( "east" ) != totalEast ){
-	// 	ERROR( classname(), "MISMATCH sumTAC BYTE" );
-	// }
-	// if ( 	pico->sumADC( "west" ) != ttotalADCWest ||
-	// 		pico->sumADC( "east" ) != ttotalADCEast ){
-	// 	ERROR( classname(), "MISMATCH sumADC BYTE" );
-	// 	ERROR( classname(),  "dWEST = " << pico->sumADC( "west" ) - ttotalADCWest );
-	// 	ERROR( classname(),  "dEAST = " << pico->sumADC( "east" ) - ttotalADCEast );
-	// }
 }
 
 
