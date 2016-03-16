@@ -118,6 +118,17 @@ void VpdPico::Init(TTree *tree)
    fChain->SetBranchAddress("bbqSumTacWest", &bbqSumTacWest, &b_event_bbqSumTacWest);
    fChain->SetBranchAddress("bbqNGoodHitEast", &bbqNGoodHitEast, &b_event_bbqNGoodHitEast);
    fChain->SetBranchAddress("bbqNGoodHitWest", &bbqNGoodHitWest, &b_event_bbqNGoodHitWest);
+   fChain->SetBranchAddress("bbqSumAdcEast", &bbqSumAdcEast, &b_event_bbqSumAdcEast);
+   fChain->SetBranchAddress("bbqSumAdcWest", &bbqSumAdcWest, &b_event_bbqSumAdcWest);
+   fChain->SetBranchAddress("npre", &npre, &b_event_npre);
+   fChain->SetBranchAddress("npost", &npost, &b_event_npost);
+   fChain->SetBranchAddress("nsum", &nsum, &b_event_nsum);
+   fChain->SetBranchAddress("bbcEastVpdNHits", &bbcEastVpdNHits, &b_event_bbcEastVpdNHits);
+   fChain->SetBranchAddress("bbcEastVpdADCsum", &bbcEastVpdADCsum, &b_event_bbcEastVpdADCsum);
+   fChain->SetBranchAddress("bbcEastVpdTACsum", &bbcEastVpdTACsum, &b_event_bbcEastVpdTACsum);
+   fChain->SetBranchAddress("bbcWestVpdNHits", &bbcWestVpdNHits, &b_event_bbcWestVpdNHits);
+   fChain->SetBranchAddress("bbcWestVpdADCsum", &bbcWestVpdADCsum, &b_event_bbcWestVpdADCsum);
+   fChain->SetBranchAddress("bbcWestVpdTACsum", &bbcWestVpdTACsum, &b_event_bbcWestVpdTACsum);
    fChain->SetBranchAddress("runId", &runId, &b_event_runId);
    fChain->SetBranchAddress("vpdZ", &vpdZ, &b_event_vpdZ);
    fChain->SetBranchAddress("vtx.mX1", &vtx_mX1, &b_event_vtx_mX1);

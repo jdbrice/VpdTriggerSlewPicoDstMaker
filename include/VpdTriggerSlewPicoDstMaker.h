@@ -148,6 +148,24 @@ public:
 				book->clone( "deltaVz_Avg_wo_Jitter", name );		
 			}
 		}
+
+		book->cd( "byteChecker" );
+
+		book->clone( "", "On_Off_nGoodHitWest", "byteChecker", "On_Off_nGoodHitWest" );
+		book->clone( "", "On_Off_nGoodHitEast", "byteChecker", "On_Off_nGoodHitEast" );
+		
+		book->clone( "", "On_Off_sumTacWest", "byteChecker", "On_Off_sumTacWest" );
+		book->clone( "", "On_Off_sumTacEast", "byteChecker", "On_Off_sumTacEast" );
+
+		book->clone( "", "On_Off_sumAdcWest", "byteChecker", "On_Off_sumAdcWest" );
+		book->clone( "", "On_Off_sumAdcEast", "byteChecker", "On_Off_sumAdcEast" );
+
+		book->clone( "", "int_sumTdcEast", "byteChecker", "int_sumTacEast" );
+		book->clone( "", "int_sumTdcEast", "byteChecker", "int_sumTacWest" );
+		book->clone( "", "int_sumTdcEast", "byteChecker", "int_sumAdcEast" );
+		book->clone( "", "int_sumTdcEast", "byteChecker", "int_sumAdcWest" );
+		book->clone( "", "int_sumTdcEast", "byteChecker", "int_nGoodEast" );
+		book->clone( "", "int_sumTdcEast", "byteChecker", "int_nGoodWest" );
 		
 
 	}
@@ -174,7 +192,7 @@ public:
 		
 		// DEBUG( classname(), "" );
 		outFile->cd();
-
+		book->cd();
 
 		data.run = pico->runNumber();
 		data.evt = pico->eventNumber(); 
@@ -183,16 +201,18 @@ public:
 		data.vpdVz = pico->vpdVz();
 
 
-		if ( fabs(data.vertexZ - pico->vpdVz()) > 3.0 ) return;
-		double px = pico->vX();
-		double py = pico->vY();
+		// if ( fabs(data.vertexZ - pico->vpdVz()) > 3.0 ) return;
+		// double px = pico->vX();
+		// double py = pico->vY();
 
-		if ( sqrt( px*px + py*py ) > 1.0 ) return;
+		// if ( sqrt( px*px + py*py ) > 1.0 ) return;
 
 		book->fill( "events", 1 );
 		if ( wantVertex && data.vertexZ == 0.0 ) return;
 
-		fillVpdTrigger();
+		// fillVpdTrigger();
+
+		megabyteChecker();
 
 		tree->Fill();
 
@@ -217,6 +237,8 @@ public:
 	
 
 	void fillVpdTrigger();
+	void byteChecker();
+	void megabyteChecker();
 
 	void bookTree();
 	void readParams();

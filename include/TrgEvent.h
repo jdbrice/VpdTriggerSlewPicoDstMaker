@@ -22,6 +22,8 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
+   static const int NSUM = 11;
+
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
    // Declaration of leaf types
@@ -29,33 +31,39 @@ public :
    UInt_t          npre;
    UInt_t          npost;
    UInt_t          nsum;
-   UShort_t        Vpd[1][64];   //[nsum]
-   UShort_t        VpdHi[1][64];   //[nsum]
-   UShort_t        bbqEastVpd[1][32];   //[nsum]
-   UShort_t        bbqWestVpd[1][32];   //[nsum]
-   UShort_t        fastBbqEastVpd[1];   //[nsum]
-   UShort_t        fastBbqWestVpd[1];   //[nsum]
-   UShort_t        sumBbqEastVpd[1];   //[nsum]
-   UShort_t        sumBbqWestVpd[1];   //[nsum]
-   UShort_t        sumADCBbqEastVpd[1];   //[nsum]
-   UShort_t        sumADCBbqWestVpd[1];   //[nsum]
-   UShort_t        nGoodBbqEastVpd[1];   //[nsum]
-   UShort_t        nGoodBbqWestVpd[1];   //[nsum]
-   UShort_t        mxqEastVpd[1][32];   //[nsum]
-   UShort_t        mxqWestVpd[1][32];   //[nsum]
-   UShort_t        fastMxqEastVpd[1];   //[nsum]
-   UShort_t        fastMxqWestVpd[1];   //[nsum]
-   UShort_t        tofMult[1];   //[nsum]
-   UShort_t        tofTrayMult[1][120];   //[nsum]
-   UShort_t        MT001[1][32];   //[nsum]
-   UShort_t        MT002[1][32];   //[nsum]
-   UShort_t        MT003[1][32];   //[nsum]
-   UShort_t        MT004[1][32];   //[nsum]
-   UShort_t        MT005[1][32];   //[nsum]
-   UShort_t        MT006[1][32];   //[nsum]
-   UShort_t        MT007[1][32];   //[nsum]
-   UShort_t        MT008[1][32];   //[nsum]
-   UChar_t         MtdDsm[1][32];   //[nsum]
+   UShort_t        Vpd[NSUM][64];   //[nsum]
+   UShort_t        VpdHi[NSUM][64];   //[nsum]
+   UShort_t        bbqEastVpd[NSUM][32];   //[nsum]
+   UShort_t        bbqWestVpd[NSUM][32];   //[nsum]
+   UShort_t        fastBbqEastVpd[NSUM];   //[nsum]
+   UShort_t        fastBbqWestVpd[NSUM];   //[nsum]
+   UShort_t        sumBbqEastVpd[NSUM];   //[nsum]
+   UShort_t        sumBbqWestVpd[NSUM];   //[nsum]
+   UShort_t        sumADCBbqEastVpd[NSUM];   //[nsum]
+   UShort_t        sumADCBbqWestVpd[NSUM];   //[nsum]
+   UShort_t        nGoodBbqEastVpd[NSUM];   //[nsum]
+   UShort_t        nGoodBbqWestVpd[NSUM];   //[nsum]
+   UShort_t        bbcEastVpdNHits[NSUM];   //[nsum]
+   UShort_t        bbcWestVpdNHits[NSUM];   //[nsum]
+   UShort_t        bbcEastVpdADCsum[NSUM];   //[nsum]
+   UShort_t        bbcWestVpdADCsum[NSUM];   //[nsum]
+   UShort_t        bbcEastVpdTACsum[NSUM];   //[nsum]
+   UShort_t        bbcWestVpdTACsum[NSUM];   //[nsum]
+   UShort_t        mxqEastVpd[NSUM][32];   //[nsum]
+   UShort_t        mxqWestVpd[NSUM][32];   //[nsum]
+   UShort_t        fastMxqEastVpd[NSUM];   //[nsum]
+   UShort_t        fastMxqWestVpd[NSUM];   //[nsum]
+   UShort_t        tofMult[NSUM];   //[nsum]
+   UShort_t        tofTrayMult[NSUM][120];   //[nsum]
+   UShort_t        MT001[NSUM][32];   //[nsum]
+   UShort_t        MT002[NSUM][32];   //[nsum]
+   UShort_t        MT003[NSUM][32];   //[nsum]
+   UShort_t        MT004[NSUM][32];   //[nsum]
+   UShort_t        MT005[NSUM][32];   //[nsum]
+   UShort_t        MT006[NSUM][32];   //[nsum]
+   UShort_t        MT007[NSUM][32];   //[nsum]
+   UShort_t        MT008[NSUM][32];   //[nsum]
+   UChar_t         MtdDsm[NSUM][32];   //[nsum]
    UShort_t        DsmTF201Ch[8];
    UShort_t        lastDsmBit[8];
 
@@ -76,6 +84,12 @@ public :
    TBranch        *b_sumADCBbqWestVpd;   //!
    TBranch        *b_nGoodBbqEastVpd;   //!
    TBranch        *b_nGoodBbqWestVpd;   //!
+   TBranch        *b_bbcEastVpdNHits;   //!
+   TBranch        *b_bbcWestVpdNHits;   //!
+   TBranch        *b_bbcEastVpdADCsum;   //!
+   TBranch        *b_bbcWestVpdADCsum;   //!
+   TBranch        *b_bbcEastVpdTACsum;   //!
+   TBranch        *b_bbcWestVpdTACsum;   //!
    TBranch        *b_mxqEastVpd;   //!
    TBranch        *b_mxqWestVpd;   //!
    TBranch        *b_fastMxqEastVpd;   //!
@@ -105,31 +119,35 @@ public :
    virtual void     Show(Long64_t entry = -1);
 
 
+
+   virtual int runNumber(){
+      return fChain->GetTreeNumber();
+   }
    virtual int sumTAC( string side = "east" ){
       if ( "east" == side || "East" == side || "EAST" == side ){
-         return sumBbqEastVpd[ iPrePost ];
+         return bbcEastVpdTACsum[ iPrePost ];
       }
       if ( "west" == side || "West" == side || "WEST" == side ){
-         return sumBbqWestVpd[ iPrePost ];  
+         return bbcWestVpdTACsum[ iPrePost ];  
       }
       return 0;
    }
 
    virtual int sumADC( string side = "east" ){
       if ( "east" == side || "East" == side || "EAST" == side ){
-         return sumADCBbqEastVpd[ iPrePost ];
+         return bbcEastVpdADCsum[ iPrePost ];
       }
       if ( "west" == side || "West" == side || "WEST" == side ){
-         return sumADCBbqWestVpd[ iPrePost ];  
+         return bbcWestVpdADCsum[ iPrePost ];  
       }
       return 0;
    }
 
    virtual int nGood( string side = "east" ) {
       if ( "west" == side || "West" == side || "WEST" == side ){
-         return nGoodBbqWestVpd[ iPrePost ];
+         return bbcWestVpdNHits[ iPrePost ];
       } else if ( "east" == side || "East" == side || "EAST" == side ){
-         return nGoodBbqEastVpd[ iPrePost ];
+         return bbcEastVpdNHits[ iPrePost ];
       }
       return 0;
    }

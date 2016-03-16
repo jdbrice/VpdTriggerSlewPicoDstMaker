@@ -77,6 +77,12 @@ void TrgEvent::Init(TTree *tree)
    fChain->SetBranchAddress("sumADCBbqWestVpd", sumADCBbqWestVpd, &b_sumADCBbqWestVpd);
    fChain->SetBranchAddress("nGoodBbqEastVpd", nGoodBbqEastVpd, &b_nGoodBbqEastVpd);
    fChain->SetBranchAddress("nGoodBbqWestVpd", nGoodBbqWestVpd, &b_nGoodBbqWestVpd);
+   fChain->SetBranchAddress("bbcEastVpdNHits", bbcEastVpdNHits, &b_bbcEastVpdNHits);
+   fChain->SetBranchAddress("bbcWestVpdNHits", bbcWestVpdNHits, &b_bbcWestVpdNHits);
+   fChain->SetBranchAddress("bbcEastVpdADCsum", bbcEastVpdADCsum, &b_bbcEastVpdADCsum);
+   fChain->SetBranchAddress("bbcWestVpdADCsum", bbcWestVpdADCsum, &b_bbcWestVpdADCsum);
+   fChain->SetBranchAddress("bbcEastVpdTACsum", bbcEastVpdTACsum, &b_bbcEastVpdTACsum);
+   fChain->SetBranchAddress("bbcWestVpdTACsum", bbcWestVpdTACsum, &b_bbcWestVpdTACsum);
    fChain->SetBranchAddress("mxqEastVpd", mxqEastVpd, &b_mxqEastVpd);
    fChain->SetBranchAddress("mxqWestVpd", mxqWestVpd, &b_mxqWestVpd);
    fChain->SetBranchAddress("fastMxqEastVpd", fastMxqEastVpd, &b_fastMxqEastVpd);

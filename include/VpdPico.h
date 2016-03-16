@@ -45,6 +45,17 @@ public :
    UShort_t        bbqSumTacWest;
    UShort_t        bbqNGoodHitEast;
    UShort_t        bbqNGoodHitWest;
+   UShort_t        bbqSumAdcEast;
+   UShort_t        bbqSumAdcWest;
+   UShort_t        npre;
+   UShort_t        npost;
+   UShort_t        nsum;
+   UShort_t        bbcEastVpdNHits;
+   UShort_t        bbcEastVpdADCsum;
+   UShort_t        bbcEastVpdTACsum;
+   UShort_t        bbcWestVpdNHits;
+   UShort_t        bbcWestVpdADCsum;
+   UShort_t        bbcWestVpdTACsum;
    Int_t           runId;
    Float_t         vpdZ;
    Double_t        vtx_mX1;
@@ -73,6 +84,17 @@ public :
    TBranch        *b_event_bbqSumTacWest;   //!
    TBranch        *b_event_bbqNGoodHitEast;   //!
    TBranch        *b_event_bbqNGoodHitWest;   //!
+   TBranch        *b_event_bbqSumAdcEast;   //!
+   TBranch        *b_event_bbqSumAdcWest;   //!
+   TBranch        *b_event_npre;   //!
+   TBranch        *b_event_npost;   //!
+   TBranch        *b_event_nsum;   //!
+   TBranch        *b_event_bbcEastVpdNHits;   //!
+   TBranch        *b_event_bbcEastVpdADCsum;   //!
+   TBranch        *b_event_bbcEastVpdTACsum;   //!
+   TBranch        *b_event_bbcWestVpdNHits;   //!
+   TBranch        *b_event_bbcWestVpdADCsum;   //!
+   TBranch        *b_event_bbcWestVpdTACsum;   //!
    TBranch        *b_event_runId;   //!
    TBranch        *b_event_vpdZ;   //!
    TBranch        *b_event_vtx_mX1;   //!
@@ -95,12 +117,31 @@ public :
       return grefmult;
    }
 
-   virtual int sumTAC( string side = "east" ){
+   virtual int sumTACAkio( string side = "east" ){
       if ( "east" == side || "East" == side || "EAST" == side ){
          return bbqSumTacEast;
       }
       if ( "west" == side || "West" == side || "WEST" == side ){
          return bbqSumTacWest;  
+      }
+      return 0;
+   }
+   virtual int sumTAC( string side = "east" ){
+      if ( "east" == side || "East" == side || "EAST" == side ){
+         return bbcEastVpdTACsum;
+      }
+      if ( "west" == side || "West" == side || "WEST" == side ){
+         return bbcWestVpdTACsum;  
+      }
+      return 0;
+   }
+
+   virtual int sumADC( string side = "east" ){
+      if ( "east" == side || "East" == side || "EAST" == side ){
+         return bbcEastVpdADCsum;
+      }
+      if ( "west" == side || "West" == side || "WEST" == side ){
+         return bbcWestVpdADCsum;  
       }
       return 0;
    }
@@ -185,11 +226,19 @@ public :
    }
 
 
-   virtual int nGood( string side = "east" ) {
+   virtual int nGoodAkio( string side = "east" ) {
       if ( "west" == side || "West" == side || "WEST" == side ){
          return bbqNGoodHitWest;
       } else if ( "east" == side || "East" == side || "EAST" == side ){
          return bbqNGoodHitEast;
+      }
+      return 0;
+   }
+   virtual int nGood( string side = "east" ) {
+      if ( "west" == side || "West" == side || "WEST" == side ){
+         return bbcWestVpdNHits;
+      } else if ( "east" == side || "East" == side || "EAST" == side ){
+         return bbcEastVpdNHits;
       }
       return 0;
    }

@@ -8,6 +8,8 @@ class DataAdapter
 {
 public:
 
+	TTree          *fChain;
+
 	int iPrePost;
 	DataAdapter() {}
 	~DataAdapter() {}

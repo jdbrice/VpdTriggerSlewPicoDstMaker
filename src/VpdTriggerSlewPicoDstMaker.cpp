@@ -2,6 +2,295 @@
 
 
 
+void VpdTriggerSlewPicoDstMaker::byteChecker(){
+
+	
+
+	book->cd( "byteChecker" );
+
+
+
+	int run = pico->runNumber();
+
+	double toCM = 0.262;
+	if ( "bbq" == crate )
+		toCM = 0.262;
+
+	//////////////////////////////////////////////////////////////////////
+	// Calculate the corrected values and fill tuple data
+	// 
+	DEBUG( classname(), "Crate = " << crate << ", refCorr = " << refCorr );
+	for ( int tube = 0; tube < 16; tube++ ){
+		
+		int adcEast = pico->adc( "east", crate, tube );
+		int tdcEast = pico->tdc( "east", crate, tube );
+		
+		int adcWest = pico->adc( "west", crate, tube );
+		int tdcWest = pico->tdc( "west", crate, tube );
+
+		int cTdcEast = corrEast( tube, adcEast, tdcEast );
+		int cTdcWest = corrWest( tube, adcWest, tdcWest );
+
+		if ( pulserCh( tube ) == tube ) {
+			cTdcEast = tdcEast;
+			cTdcWest = tdcWest;
+		}
+		
+		if ( refCorr && pulserCh( tube ) != tube ){
+			DEBUG( "", "[" << tube <<"]" << pulserMeanEast[ pulserCh( tube ) ] );
+
+			cTdcEast = cTdcEast - (pico->tdc( "east", crate, pulserCh( tube ) ) - pulserMeanEast[ pulserCh( tube ) ] );
+			cTdcWest = cTdcWest - (pico->tdc( "west", crate, pulserCh( tube ) ) - pulserMeanWest[ pulserCh( tube ) ] );	
+
+		}
+
+		if ( false == goodHitE( adcEast, cTdcEast ) )
+			cTdcEast = 0;
+		if ( false == goodHitW( adcWest, cTdcWest ) )
+			cTdcWest = 0;
+
+		data.tdcEast[ tube ] = cTdcEast;
+		data.adcEast[ tube ] = adcEast;
+
+		data.tdcWest[ tube ] = cTdcWest;
+		data.adcWest[ tube ] = adcWest;
+
+	} // tube loop
+
+
+	//////////////////////////////////////////////////////////////////////
+	/// Calculate the average
+	/// 
+	int nEast = 0, nWest = 0;
+	int totalEast = 0, totalWest = 0;
+	int totalADCEast = 0, totalADCWest = 0;
+
+	for ( int i = 0; i < 16; i++ ){
+		if ( pulserCh( i ) == i ) continue;
+		
+		if ( goodHitE( data.adcEast[ i ], data.tdcEast[ i ] ) ){
+			nEast++;
+			totalEast += data.tdcEast[ i ];
+			totalADCEast += data.adcEast[ i ];
+		}
+
+		if ( goodHitW( data.adcWest[ i ], data.tdcWest[ i ] ) ){
+			nWest++;
+			totalWest += data.tdcWest[ i ];
+			totalADCWest += data.adcWest[ i ];
+		}
+	}
+
+
+	book->fill( "On_Off_nGoodHitWest", pico->nGood( "west" ), nWest );
+	book->fill( "On_Off_nGoodHitEast", pico->nGood( "east" ), nEast );
+	
+	book->fill( "On_Off_sumTacWest", pico->sumTAC( "west" ), totalWest );
+	book->fill( "On_Off_sumTacEast", pico->sumTAC( "east" ), totalEast );
+
+	int ttotalADCWest = totalADCWest & 0xfff;
+	if ( totalADCWest > 4095 )
+		ttotalADCWest = 4095;
+	int ttotalADCEast = totalADCEast & 0xfff;
+	if ( totalADCEast > 4095 )
+		ttotalADCEast = 4095;
+
+	book->fill( "On_Off_sumAdcWest", pico->sumADC( "west" ), ttotalADCWest );
+	book->fill( "On_Off_sumAdcEast", pico->sumADC( "east" ), ttotalADCEast );
+
+
+
+	// cout << "total adcWest = " << totalADCWest << ", " << pico->sumADC( "west" )<< endl;
+
+	book->fill( "int_sumTacEast", pico->sumTAC( "east" ) == totalEast );
+	book->fill( "int_sumTacWest", pico->sumTAC( "west" ) == totalWest );
+
+	book->fill( "int_sumAdcEast", pico->sumADC( "east" ) == totalADCEast );
+	book->fill( "int_sumAdcWest", pico->sumADC( "west" ) == totalADCWest );
+
+	book->fill( "int_nGoodEast", pico->nGood( "east" ) == nEast );
+	book->fill( "int_nGoodWest", pico->nGood( "west" ) == nWest );
+
+	// if ( pico->nGood( "east" ) != nEast ){
+	// 	ERROR( classname(), "MISMATCH nEast BYTE" );
+	// }
+	// if ( pico->nGood( "west" ) != nWest ){
+	// 	ERROR( classname(), "MISMATCH nWest BYTE" );
+	// }
+	// if ( 	pico->sumTAC( "west" ) != totalWest ||
+	// 		pico->sumTAC( "east" ) != totalEast ){
+	// 	ERROR( classname(), "MISMATCH sumTAC BYTE" );
+	// }
+	// if ( 	pico->sumADC( "west" ) != ttotalADCWest ||
+	// 		pico->sumADC( "east" ) != ttotalADCEast ){
+	// 	ERROR( classname(), "MISMATCH sumADC BYTE" );
+	// 	ERROR( classname(),  "dWEST = " << pico->sumADC( "west" ) - ttotalADCWest );
+	// 	ERROR( classname(),  "dEAST = " << pico->sumADC( "east" ) - ttotalADCEast );
+	// }
+}
+
+
+void VpdTriggerSlewPicoDstMaker::megabyteChecker(){
+
+	
+
+	// book->cd( "megabyteChecker" );
+
+
+
+	int run = pico->runNumber();
+
+	string str = chain->GetFile()->GetName();
+	string dir = chain->GetFile()->GetName();
+	dir = dir.substr(64, 11);
+
+	book->cd( dir );
+	if ( !book->exists( "On_Off_nGoodHitWest" ) ){
+
+		// string str = chain->GetFile()->GetName();
+
+		// ERROR( classname(), str.substr(64, 11) );
+
+		book->clone( "", "On_Off_nGoodHitWest", dir, "On_Off_nGoodHitWest" );
+		book->clone( "", "On_Off_nGoodHitEast", dir, "On_Off_nGoodHitEast" );
+		
+		book->clone( "", "On_Off_sumTacWest", dir, "On_Off_sumTacWest" );
+		book->clone( "", "On_Off_sumTacEast", dir, "On_Off_sumTacEast" );
+
+		book->clone( "", "On_Off_sumAdcWest", dir, "On_Off_sumAdcWest" );
+		book->clone( "", "On_Off_sumAdcEast", dir, "On_Off_sumAdcEast" );
+
+		book->clone( "", "int_sumTdcEast", dir, "int_sumTacEast" );
+		book->clone( "", "int_sumTdcEast", dir, "int_sumTacWest" );
+		book->clone( "", "int_sumTdcEast", dir, "int_sumAdcEast" );
+		book->clone( "", "int_sumTdcEast", dir, "int_sumAdcWest" );
+		book->clone( "", "int_sumTdcEast", dir, "int_nGoodEast" );
+		book->clone( "", "int_sumTdcEast", dir, "int_nGoodWest" );	
+		book->clone( "", "int_sumTdcEast", dir, "int_All" );
+	}
+
+	
+
+	//////////////////////////////////////////////////////////////////////
+	// Calculate the corrected values and fill tuple data
+	// 
+	DEBUG( classname(), "Crate = " << crate << ", refCorr = " << refCorr );
+	for ( int tube = 0; tube < 16; tube++ ){
+		
+		int adcEast = pico->adc( "east", crate, tube );
+		int tdcEast = pico->tdc( "east", crate, tube );
+		
+		int adcWest = pico->adc( "west", crate, tube );
+		int tdcWest = pico->tdc( "west", crate, tube );
+
+		int cTdcEast = corrEast( tube, adcEast, tdcEast );
+		int cTdcWest = corrWest( tube, adcWest, tdcWest );
+
+		if ( pulserCh( tube ) == tube ) {
+			cTdcEast = tdcEast;
+			cTdcWest = tdcWest;
+		}
+		
+		if ( refCorr && pulserCh( tube ) != tube ){
+			DEBUG( "", "[" << tube <<"]" << pulserMeanEast[ pulserCh( tube ) ] );
+
+			cTdcEast = cTdcEast - (pico->tdc( "east", crate, pulserCh( tube ) ) - pulserMeanEast[ pulserCh( tube ) ] );
+			cTdcWest = cTdcWest - (pico->tdc( "west", crate, pulserCh( tube ) ) - pulserMeanWest[ pulserCh( tube ) ] );	
+
+		}
+
+		if ( false == goodHitE( adcEast, cTdcEast ) )
+			cTdcEast = 0;
+		if ( false == goodHitW( adcWest, cTdcWest ) )
+			cTdcWest = 0;
+
+		data.tdcEast[ tube ] = cTdcEast;
+		data.adcEast[ tube ] = adcEast;
+
+		data.tdcWest[ tube ] = cTdcWest;
+		data.adcWest[ tube ] = adcWest;
+
+	} // tube loop
+
+
+	//////////////////////////////////////////////////////////////////////
+	/// Calculate the average
+	/// 
+	int nEast = 0, nWest = 0;
+	int totalEast = 0, totalWest = 0;
+	int totalADCEast = 0, totalADCWest = 0;
+
+	for ( int i = 0; i < 16; i++ ){
+		if ( pulserCh( i ) == i ) continue;
+		
+		if ( goodHitE( data.adcEast[ i ], data.tdcEast[ i ] ) ){
+			nEast++;
+			totalEast += data.tdcEast[ i ];
+			totalADCEast += data.adcEast[ i ];
+		}
+
+		if ( goodHitW( data.adcWest[ i ], data.tdcWest[ i ] ) ){
+			nWest++;
+			totalWest += data.tdcWest[ i ];
+			totalADCWest += data.adcWest[ i ];
+		}
+	}
+
+
+	book->fill( "On_Off_nGoodHitWest", pico->nGood( "west" ), nWest );
+	book->fill( "On_Off_nGoodHitEast", pico->nGood( "east" ), nEast );
+	
+	book->fill( "On_Off_sumTacWest", pico->sumTAC( "west" ), totalWest );
+	book->fill( "On_Off_sumTacEast", pico->sumTAC( "east" ), totalEast );
+
+	int ttotalADCWest = totalADCWest & 0xfff;
+	if ( totalADCWest > 4095 )
+		ttotalADCWest = 4095;
+	int ttotalADCEast = totalADCEast & 0xfff;
+	if ( totalADCEast > 4095 )
+		ttotalADCEast = 4095;
+
+	book->fill( "On_Off_sumAdcWest", pico->sumADC( "west" ), ttotalADCWest );
+	book->fill( "On_Off_sumAdcEast", pico->sumADC( "east" ), ttotalADCEast );
+
+
+
+	// cout << "total adcWest = " << totalADCWest << ", " << pico->sumADC( "west" )<< endl;
+
+	book->fill( "int_sumTacEast", pico->sumTAC( "east" ) == totalEast );
+	book->fill( "int_sumTacWest", pico->sumTAC( "west" ) == totalWest );
+
+	book->fill( "int_sumAdcEast", pico->sumADC( "east" ) == totalADCEast );
+	book->fill( "int_sumAdcWest", pico->sumADC( "west" ) == totalADCWest );
+
+	book->fill( "int_nGoodEast", pico->nGood( "east" ) == nEast );
+	book->fill( "int_nGoodWest", pico->nGood( "west" ) == nWest );
+
+	bool perfect = false;
+	perfect = ( pico->sumTAC( "east" ) == totalEast && pico->sumTAC( "west" ) == totalWest && pico->sumADC( "east" ) == totalADCEast && pico->sumADC( "west" ) == totalADCWest && pico->nGood( "east" ) == nEast && pico->nGood( "west" ) == nWest );
+	book->fill( "int_All", perfect );
+
+
+	// if ( pico->nGood( "east" ) != nEast ){
+	// 	ERROR( classname(), "MISMATCH nEast BYTE" );
+	// }
+	// if ( pico->nGood( "west" ) != nWest ){
+	// 	ERROR( classname(), "MISMATCH nWest BYTE" );
+	// }
+	// if ( 	pico->sumTAC( "west" ) != totalWest ||
+	// 		pico->sumTAC( "east" ) != totalEast ){
+	// 	ERROR( classname(), "MISMATCH sumTAC BYTE" );
+	// }
+	// if ( 	pico->sumADC( "west" ) != ttotalADCWest ||
+	// 		pico->sumADC( "east" ) != ttotalADCEast ){
+	// 	ERROR( classname(), "MISMATCH sumADC BYTE" );
+	// 	ERROR( classname(),  "dWEST = " << pico->sumADC( "west" ) - ttotalADCWest );
+	// 	ERROR( classname(),  "dEAST = " << pico->sumADC( "east" ) - ttotalADCEast );
+	// }
+}
+
+
+
 void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 	book->cd();
@@ -75,6 +364,8 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 		data.adcWest[ tube ] = adcWest;
 
 	} // tube loop
+
+	
 
 
 	//////////////////////////////////////////////////////////////////////
@@ -231,7 +522,7 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 
 	book->fill( "sumTdcEastWrong", pico->sumTAC( "east" ) - jtotalEast );	
-	if ( pico->sumTAC( "east" ) != jtotalEast ){
+	if ( pico->sumTAC( "east" ) != totalEast ){
 		book->fill( "int_sumTdcEast", 5 );
 		// if ( 4 != (pico->sumTAC( "east" ) - jtotalEast) &&
 		// 	128 != (pico->sumTAC( "east" ) - jtotalEast) &&
@@ -244,7 +535,7 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 		book->fill( "int_sumTdcEast", 1 );
 	}
 
-	if ( pico->sumTAC( "west" ) != jtotalWest ){
+	if ( pico->sumTAC( "west" ) != totalWest ){
 		book->fill( "int_sumTdcWest", 5 );
 	} else {
 		book->fill( "int_sumTdcWest", 1 );
@@ -270,6 +561,9 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 	book->fill( "Avg_wo_Jitter_grefmult_nTubes", pico->gRefMult()/10.0, (nEast + nWest) );
 
+	book->fill( "East_Avg_wo_Jitter_grefmult_nTubes", pico->gRefMult()/10.0, nEast );
+	book->fill( "West_Avg_wo_Jitter_grefmult_nTubes", pico->gRefMult()/10.0, nWest );
+
 
 	string name = "deltaVz_nE2_nW2";
 	book->fill( name, ( (totalWest2 / 2.0) - (totalEast2 / 2.0) ) * toCM - pico->vZ() );
@@ -290,6 +584,10 @@ void VpdTriggerSlewPicoDstMaker::fillVpdTrigger(){
 
 	// book->fill( "onlineL0", jnEast * pico->fastTdc( "west" ) - jnWest * pico->fastTdc( "east" ) );
 
+
+
+	book->fill( "avg_wo_Jitter_TAC_Vz", pico->vZ(), avgWest - avgEast );
+	book->fill( "l0_TAC_Vz", pico->vZ(), (pico->sumTAC( "west" ) / (pico->nGood( "west" ))) - (pico->sumTAC( "east" ) / (pico->nGood( "east" )))  );
 
 
 
